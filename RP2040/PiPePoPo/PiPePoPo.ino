@@ -36,7 +36,7 @@ short shortSampleBuffer[bufferSize];
 int floatSampleIndex = 0;
 long totalSampleIndex = 0;
 
-bool verbose = false;
+bool verbose = true;
 
 bool benchmark = true;
 
