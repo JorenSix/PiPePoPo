@@ -36,6 +36,12 @@ short shortSampleBuffer[bufferSize];
 int floatSampleIndex = 0;
 long totalSampleIndex = 0;
 
+bool verbose = true;
+
+bool benchmark = true;
+
+int mouseMovement = 5;
+
 
 // Number of audio samples read
 volatile int samplesRead;
@@ -52,34 +58,38 @@ void benchmarkFloat(){
   }
   time = millis() - start;
 
-  Serial.print("_fmul took");
+  Serial.print("10^6 float mul took ");
   Serial.print(time);
   Serial.print(" total ");
   Serial.print(total);
+  Serial.print(" milliseconds ");
   Serial.println();
 
-  start = millis();
-  total = 0;
-  for(float i = 0; i < 1000000; i++){
+  start = micros();
+  fixed_point total_fixed = 0;
+  for(fixed_point i = 0; i < 1000000; i++){
     total += i * i;
   }
-  time = millis() - start;
+  time = micros() - start;
 
-  Serial.print(" * took");
-  Serial.println(time);
-  Serial.print(" total ");
-  Serial.print(total);
+  Serial.print("10^6 fixed mul took ");
+  Serial.print(time);
+  Serial.print(" microseconds ");
   Serial.println();
 
 }
 
 
 void setup() {
-  Serial.begin(115200);
-  while (!Serial);
 
-  benchmarkFloat();
+  if(benchmark || verbose) {
+    Serial.begin(115200);
+    while (!Serial);
+  }
 
+  if(benchmark ) benchmarkFloat();
+  
+  
   yin = yin_fixed_new(frequency, bufferSize);
  
   // Configure the data receive callback
@@ -94,20 +104,20 @@ void setup() {
   // - a 16 kHz sample rate for the Arduino Nano 33 BLE Sense
   // - a 32 kHz or 64 kHz sample rate for the Arduino Portenta Vision Shield
   if (!PDM.begin(channels, frequency)) {
-    Serial.println("Failed to start PDM!");
+    if(verbose) Serial.println("Failed to start PDM!");
     while (1);
   }
 }
 
 unsigned long last_click = 0;
 void mouseEvents(float pitch_in_hz){
-  if(pitch_in_hz > 500 && pitch_in_hz < 525) Mouse.move(12,0);
+  if(pitch_in_hz > 500 && pitch_in_hz < 525) Mouse.move(mouseMovement,0);
 
-  if(pitch_in_hz > 565 && pitch_in_hz < 585) Mouse.move(-12,0);
+  if(pitch_in_hz > 565 && pitch_in_hz < 585) Mouse.move(-mouseMovement,0);
 
-  if(pitch_in_hz > 620 && pitch_in_hz < 655) Mouse.move(0,-12);
+  if(pitch_in_hz > 620 && pitch_in_hz < 655) Mouse.move(0,-mouseMovement);
 
-  if(pitch_in_hz > 670 && pitch_in_hz < 696) Mouse.move(0,12);
+  if(pitch_in_hz > 670 && pitch_in_hz < 696) Mouse.move(0,mouseMovement);
 
 
   if(pitch_in_hz > 960 && pitch_in_hz < 990){
@@ -123,30 +133,31 @@ void mouseEvents(float pitch_in_hz){
 void loop() {
 
   // Wait for samples to be read
-  if (samplesRead) {
+  if (!samplesRead) return;
+  
+  // Print samples to the serial monitor or plotter
+  for (int i = 0; i < samplesRead; i++) {
+    float sample = sampleBuffer[i];
+    shortSampleBuffer[floatSampleIndex] = sample;
+    floatSampleIndex++;
+    totalSampleIndex++;
+  }
 
-    // Print samples to the serial monitor or plotter
-    for (int i = 0; i < samplesRead; i++) {
-      float sample = sampleBuffer[i];
-      shortSampleBuffer[floatSampleIndex]= sample;
-      floatSampleIndex++;
-      totalSampleIndex++;
-    }
+  // Clear the read count
+  samplesRead = 0;
 
-    // Clear the read count
-    samplesRead = 0;
+  //handle full buffer
+  if(floatSampleIndex == bufferSize){
+    floatSampleIndex=0;
 
-    //handle full buffer
-    if(floatSampleIndex == bufferSize){
-      floatSampleIndex=0;
+    float pitch = yin_fixed_estimate_pitch(yin, shortSampleBuffer);
 
-      float pitch = yin_fixed_estimate_pitch(yin, shortSampleBuffer);
+    float probability = yin_fixed_last_pitch_estimate_probability(yin);
+  
+    float time = totalSampleIndex / (float) frequency;
+    mouseEvents(pitch);
 
-      float probability = yin_fixed_last_pitch_estimate_probability(yin);
-   
-      float time = totalSampleIndex / (float) frequency;
-        mouseEvents(pitch);
-  /*
+    if(verbose){
       Serial.print("time_s ");
       Serial.print(time);
 
@@ -156,11 +167,8 @@ void loop() {
       Serial.print(" pitch (Hz) ");
       Serial.print(pitch);
 
-    
-
-      Serial.println();*/
+      Serial.println();
     }
-
   }
 }
 

@@ -1,4 +1,12 @@
-# Project Name
+# PiPePoPo - Pitch Perfect Pointer Positioning - 
+
+
+
+- [Installation](#installation)
+- [Usage](#usage)
+- [Contributing](#contributing)
+- [License](#license)
+
 
 ## Description
 
@@ -7,26 +15,21 @@ This repository contains code to allow a flute to control the mouse cursor.
 It contains two implementations. A chrome browser extention and a version for microcontrollers.
 
 
+## PiPePoPo Hardware 
 
-## Table of Contents
 
-- [Installation](#installation)
-- [Usage](#usage)
-- [Contributing](#contributing)
-- [License](#license)
-
-## Installation
+## PiPePoPo Browser extension 
 
 Instructions on how to install and set up the project.
 
 ## Usage
 
-Instructions on how to use the project and any relevant examples.
+
 
 ## Contributing
 
 Guidelines for contributing to the project and how to submit pull requests.
 
-## License
+## Credits
 
-Information about the project's license.
+PiPePoPo by Joren Six
