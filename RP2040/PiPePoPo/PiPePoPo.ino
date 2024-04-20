@@ -36,7 +36,7 @@ short shortSampleBuffer[bufferSize];
 int floatSampleIndex = 0;
 long totalSampleIndex = 0;
 
-bool verbose = true;
+bool verbose = false;
 
 bool benchmark = true;
 
@@ -53,28 +53,34 @@ void benchmarkFloat(){
   
   start = millis();
   float total = 0;
-  for(float i = 0; i < 1000000; i++){
-    total += (i * i);
+  float one = 0.001;
+  float other = 1.00012654;
+  for(size_t i = 0; i < 1000000; i++){
+    total += (one * other);
   }
   time = millis() - start;
 
-  Serial.print("10^6 float mul took ");
+  Serial.print("10^6 float mul add took ");
   Serial.print(time);
-  Serial.print(" total ");
+  Serial.print(" milliseconds. Result: ");
   Serial.print(total);
-  Serial.print(" milliseconds ");
   Serial.println();
 
   start = micros();
-  fixed_point total_fixed = 0;
-  for(fixed_point i = 0; i < 1000000; i++){
-    total += i * i;
+  fixed_point total_fixed = fixed_point_from_f(0);
+  fixed_point one_fixed = fixed_point_from_f(one);
+  fixed_point other_fixed = fixed_point_from_f(other);
+  for(size_t i = 0; i < 1000000; i++){
+    total_fixed += fixed_point_mul(one_fixed , other_fixed);
   }
   time = micros() - start;
 
-  Serial.print("10^6 fixed mul took ");
+  Serial.print("10^6 fixed mul add took ");
   Serial.print(time);
-  Serial.print(" microseconds ");
+  Serial.print(" microseconds. ");
+  Serial.print("Result: ");
+  Serial.print(fixed_point_to_f(total_fixed));
+
   Serial.println();
 
 }
