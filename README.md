@@ -1,4 +1,4 @@
-# PiPePoPo - Pitch Perfect Pointer Positioning -
+# PiPePoPo - Pitch Perfect Pointer Positioning
 
 This repository contains code to allow a flute to control the mouse cursor. See the movie below to get an idea of the concept.
 
