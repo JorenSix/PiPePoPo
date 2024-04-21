@@ -26,4 +26,4 @@ The Yin is based on the TarsosDSP implementation which itself is based on [aubio
 
 PiPePoPo by Joren Six
 
-![Using PiPePoPo](./media/pipepopo-in-action.jpg)
+![Using PiPePoPo](./media/PiPe-PoPo-in-action.jpg)
